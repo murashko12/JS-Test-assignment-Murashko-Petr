@@ -157,7 +157,7 @@ const generateTestData = (): IUser[] => {
             hireDate: new Date(Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 365 * 5)).toISOString(),
             birthDate: Math.random() > 0.2 ? new Date(1980 + Math.floor(Math.random() * 20), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28)).toISOString() : undefined,
             status: statuses[Math.floor(Math.random() * statuses.length)],
-            avatar: Math.random() > 0.8 ? `https://i.pravatar.cc/40?u=${i}` : undefined,
+            
             notes: Math.random() > 0.7 ? 'Дополнительные заметки' : undefined,
             createdAt: new Date(Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 365 * 2)).toISOString(),
             updatedAt: new Date().toISOString()

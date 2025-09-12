@@ -12,7 +12,6 @@ export interface IUser {
     hireDate: string
     birthDate?: string
     status: 'active' | 'inactive'
-    avatar?: string
     notes?: string
     createdAt: string
     updatedAt: string

@@ -1,19 +1,6 @@
-import { Space, Avatar, Tag, Button } from 'antd';
-import { EditOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import type { IUser } from '../types/User';
-
-export const renderFullName = (_: unknown, record: IUser) => (
-  <Space>
-    <Avatar 
-      size="small" 
-      src={record.avatar} 
-      icon={!record.avatar && <UserOutlined />}
-    />
-    <span>
-      {record.lastName} {record.firstName.charAt(0)}.{record.patronymic ? record.patronymic.charAt(0) + '.' : ''}
-    </span>
-  </Space>
-);
+import { Space, Tag, Button } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import type { IUser } from '../types/User'
 
 export const renderGroupName = (groupName: string | undefined) => groupName || '—';
 
