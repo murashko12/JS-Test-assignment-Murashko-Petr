@@ -6,6 +6,7 @@ import type { GetProp, UploadFile, UploadProps } from 'antd'
 import { Upload, message } from 'antd'
 import ImgCrop from 'antd-img-crop'
 import { useNavigate } from 'react-router-dom'
+import { Department, DepartmentLabels, Position, PositionLabels } from '../config/enums.config'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
@@ -68,19 +69,18 @@ const UserCreatePage = () => {
                             onPreview={onPreview}
                             beforeUpload={beforeUpload}
                             maxCount={1}
-                            style={{ width: 250, height: 250 }}
+                            className="custom-upload"
                         >
                             {fileList.length < 1 && (
                                 <div style={{ 
-                                    width: 300, 
-                                    height: 300, 
                                     display: 'flex', 
                                     alignItems: 'center', 
-                                    justifyContent: 'center' 
+                                    justifyContent: 'center',
+                                    height: '100%'
                                 }}>
                                     + Загрузить фото
                                 </div>
-                            )}
+                            )}  
                         </Upload>
                     </ImgCrop>
                     <Flex vertical justify="space-between">
@@ -136,29 +136,27 @@ const UserCreatePage = () => {
                 <Select
                     size="large"
                     showSearch
-                    placeholder="Select a person"
-                    filterOption={(input, option) =>
+                    placeholder="Отдел"
+                    filterOption={(input, option) => 
                         (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                     }
-                    options={[
-                        { value: '1', label: 'Jack' },
-                        { value: '2', label: 'Lucy' },
-                        { value: '3', label: 'Tom' },
-                    ]}
+                    options={Object.values(Department).map(value => ({
+                        value,
+                        label: DepartmentLabels[value]
+                    }))}
                     className="!w-[250px]"
                 />
                 <Select
                     size="large"
                     showSearch
-                    placeholder="Select a person"
-                    filterOption={(input, option) =>
+                    placeholder="Должность"
+                    filterOption={(input, option) => 
                         (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                     }
-                    options={[
-                        { value: '1', label: 'Jack' },
-                        { value: '2', label: 'Lucy' },
-                        { value: '3', label: 'Tom' },
-                    ]}
+                    options={Object.values(Position).map(value => ({
+                        value,
+                        label: PositionLabels[value]
+                    }))}
                     className="!w-[250px]"
                 />
             </Flex>

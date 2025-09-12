@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+.custom-upload .ant-upload-select {
+    width: 250px !important;
+    height: 250px !important;
+}
+
+.custom-upload .ant-upload-list-item-container {
+    width: 250px !important;
+    height: 250px !important;
+}
