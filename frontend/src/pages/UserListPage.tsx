@@ -5,6 +5,7 @@ import { EditOutlined, DeleteOutlined, SearchOutlined, UserAddOutlined } from '@
 import type { IUser } from '../types/User'
 import { useTableStyles } from '../config/styles.config'
 import { useNavigate } from 'react-router-dom'
+import { useGetUsersQuery } from '../services/api'
 
 const columns: TableColumnsType<IUser> = [
     {
@@ -167,9 +168,21 @@ const generateTestData = (): IUser[] => {
 
 const UserTable = () => {
     const navigate = useNavigate()
+
     const { styles } = useTableStyles()
     const [ dataSource, setDataSource ] = useState<IUser[]>(generateTestData())
     const [ searchText, setSearchText ] = useState('')
+    const [currentPage, setCurrentPage] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
+
+    // RTK Query hooks
+    const { data, error, isLoading, refetch } = useGetUsersQuery({
+        search: '',
+        page: currentPage,
+        limit: pageSize,
+    })
+
+    console.log(data)
 
     const handleEdit = (user: IUser) => {
         console.log('Редактирование пользователя:', user)
