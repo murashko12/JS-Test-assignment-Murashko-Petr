@@ -1,89 +1,19 @@
 import { DatePicker, Flex, Input, ConfigProvider, Select, Button } from 'antd'
 import { MailOutlined, PhoneOutlined, UserAddOutlined } from '@ant-design/icons'
 import ruRU from 'antd/lib/locale/ru_RU'
-import { useState } from 'react'
-import type { GetProp, UploadFile, UploadProps } from 'antd'
-import { Upload, message } from 'antd'
-import ImgCrop from 'antd-img-crop'
 import { useNavigate } from 'react-router-dom'
 import { Department, DepartmentLabels, Position, PositionLabels } from '../config/enums.config'
 
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
-
 const UserCreatePage = () => {
-    const navigate = useNavigate()
-    const [fileList, setFileList] = useState<UploadFile[]>([])
     
-    const onChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-        setFileList(newFileList.slice(-1))
-    }
-
-    const onPreview = async (file: UploadFile) => {
-        let src = file.url as string;
-        if (!src) {
-            src = await new Promise((resolve) => {
-                const reader = new FileReader()
-                reader.readAsDataURL(file.originFileObj as FileType)
-                reader.onload = () => resolve(reader.result as string)
-            })
-        }
-        const image = new Image()
-        image.src = src
-        const imgWindow = window.open(src)
-        imgWindow?.document.write(image.outerHTML)
-    }
-
-    const beforeUpload = (file: FileType) => {
-        if (fileList.length >= 1) {
-            message.error('Можно загрузить только одно фото');
-            return Upload.LIST_IGNORE   
-        }
-
-        // Проверяем тип файла (только изображения)
-        const isImage = file.type.startsWith('image/')
-        if (!isImage) {
-            message.error('Можно загружать только изображения!')
-            return Upload.LIST_IGNORE
-        }
-
-        // Проверяем размер файла (максимум 2MB)
-        const isLt2M = file.size / 1024 / 1024 < 2
-        if (!isLt2M) {
-            message.error('Изображение должно быть меньше 2MB!')
-            return Upload.LIST_IGNORE
-        }
-        
-        return true
-    }
-
+    const navigate = useNavigate()
+    
     return (
         <Flex vertical gap={"large"}>
             <Flex gap={"large"} justify="space-between">
                 <Flex gap={"large"}>
-                    <ImgCrop rotationSlider>
-                        <Upload
-                            action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-                            listType="picture-card"
-                            fileList={fileList}
-                            onChange={onChange}
-                            onPreview={onPreview}
-                            beforeUpload={beforeUpload}
-                            maxCount={1}
-                            className="custom-upload"
-                        >
-                            {fileList.length < 1 && (
-                                <div style={{ 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center',
-                                    height: '100%'
-                                }}>
-                                    + Загрузить фото
-                                </div>
-                            )}  
-                        </Upload>
-                    </ImgCrop>
-                    <Flex vertical justify="space-between">
+                    
+                    <Flex vertical gap={"large"}>
                         <Input
                             size="large" 
                             placeholder="Фамилия" 

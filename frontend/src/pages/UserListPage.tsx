@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Table, Tag, Button, Space, Avatar, Input, Flex } from 'antd'
+import { Table, Tag, Button, Space, Input, Flex } from 'antd'
 import type { TableColumnsType } from 'antd'
-import { EditOutlined, DeleteOutlined, UserOutlined, SearchOutlined, UserAddOutlined } from '@ant-design/icons'
+import { EditOutlined, DeleteOutlined, SearchOutlined, UserAddOutlined } from '@ant-design/icons'
 import type { IUser } from '../types/User'
 import { useTableStyles } from '../config/styles.config'
 import { useNavigate } from 'react-router-dom'
@@ -22,16 +22,9 @@ const columns: TableColumnsType<IUser> = [
         width: 200,
         fixed: 'left',
         render: (_, record) => (
-            <Space>
-                <Avatar 
-                    size="small" 
-                    src={record.avatar} 
-                    icon={!record.avatar && <UserOutlined />}
-                />
-                <span>
-                    {record.lastName} {record.firstName.charAt(0)}.{record.patronymic ? record.patronymic.charAt(0) + '.' : ''}
-                </span>
-            </Space>
+            <span>
+                {record.lastName} {record.firstName.charAt(0)}.{record.patronymic ? record.patronymic.charAt(0) + '.' : ''}
+            </span>
         ),
         sorter: (a, b) => `${a.lastName}${a.firstName}`.localeCompare(`${b.lastName}${b.firstName}`)
     },
@@ -123,13 +116,11 @@ const columns: TableColumnsType<IUser> = [
                     size="small" 
                     icon={<EditOutlined />}
                 />
-        
                 <Button 
                     danger 
                     size="small" 
                     icon={<DeleteOutlined />}
                 />
-        
             </Space>
         )
     }
