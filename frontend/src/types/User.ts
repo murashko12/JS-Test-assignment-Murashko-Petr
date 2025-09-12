@@ -1,3 +1,5 @@
+import type { Department, Position } from "../config/enums.config"
+
 export interface IUser {
     id: number
     firstName: string
@@ -5,8 +7,8 @@ export interface IUser {
     patronymic?: string
     email: string
     phone?: string
-    position: string
-    department: string
+    position: Position
+    department: Department
     groupId?: number
     groupName?: string
     hireDate: string
