@@ -17,13 +17,34 @@ https://js-test-assignment-murashko-petr.vercel.app/
 
 ```
 git clone https://github.com/murashko12/JS-Test-assignment-Murashko-Petr.git
+cd JS-Test-assignment-Murashko-Petr
 ```
 
 ## Настройка backend
 
+- Переходим в папку backend
 ```
 cd backend
+```
+
+- Устанавливаем зависимости
+```
 npm install
+```
+
+- Копируем файл с переменными окружения и настраиваем его
+```
+cp .env.example .env
+```
+
+- Запуск миграции и генерация клиента (Prisma)
+```
+npx prisma generate
+npx prisma migrate dev
+```
+
+- Запускаем сервер в режиме разработки
+```
 npm run start:dev
 ```
 
