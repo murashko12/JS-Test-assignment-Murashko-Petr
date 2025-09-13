@@ -1,136 +1,13 @@
 import { useState } from 'react'
 import { Table, Tag, Button, Space, Input, Flex, Spin, Alert } from 'antd'
 import type { TableColumnsType } from 'antd'
-import { EditOutlined, DeleteOutlined, SearchOutlined, UserAddOutlined } from '@ant-design/icons'
+import { EditOutlined, SearchOutlined, UserAddOutlined } from '@ant-design/icons'
 import type { IUser } from '../types/User'
 import { useTableStyles } from '../config/styles.config'
 import { useNavigate } from 'react-router-dom'
 import { useGetUsersQuery } from '../services/api'
 import { getDepartmentLabel, getPositionLabel, } from '../config/enums.config'
-
-const columns: TableColumnsType<IUser> = [
-    {
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
-        width: 80,
-        fixed: 'left',
-        sorter: (a, b) => a.id - b.id,
-    },
-    {
-        title: 'ФИО',
-        dataIndex: 'fullName',
-        key: 'fullName',
-        width: 200,
-        fixed: 'left',
-        render: (_, record) => (
-            <span>
-                {record.lastName} {record.firstName.charAt(0)}.{record.patronymic ? record.patronymic.charAt(0) + '.' : ''}
-            </span>
-        ),
-        sorter: (a, b) => `${a.lastName}${a.firstName}`.localeCompare(`${b.lastName}${b.firstName}`)
-    },
-    {
-        title: 'Группа',
-        dataIndex: 'groupName',
-        key: 'groupName',
-        width: 150,
-        fixed: 'left',
-        render: (groupName) => groupName || '—',
-        sorter: (a, b) => (a.groupName || '').localeCompare(b.groupName || '')
-    },
-    {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
-        width: 200,
-        render: (email) => <a href={`mailto:${email}`}>{email}</a>
-    },
-    {
-        title: 'Телефон',
-        dataIndex: 'phone',
-        key: 'phone',
-        width: 150,
-        render: (phone) => phone || '—'
-    },
-    {
-        title: 'Должность',
-        dataIndex: 'position',
-        key: 'position',
-        width: 180,
-        render: (position) => getPositionLabel(position),
-        sorter: (a, b) => getPositionLabel(a.position).localeCompare(getPositionLabel(b.position))
-    },
-    {
-        title: 'Отдел',
-        dataIndex: 'department',
-        key: 'department',
-        width: 150,
-        render: (department) => getDepartmentLabel(department),
-        sorter: (a, b) => getDepartmentLabel(a.department).localeCompare(getDepartmentLabel(b.department)),
-    },
-    {
-        title: 'Дата приема',
-        dataIndex: 'hireDate',
-        key: 'hireDate',
-        width: 120,
-        render: (date) => new Date(date).toLocaleDateString('ru-RU'),
-        sorter: (a, b) => new Date(a.hireDate).getTime() - new Date(b.hireDate).getTime(),
-    },
-    {
-        title: 'Дата рождения',
-        dataIndex: 'birthDate',
-        key: 'birthDate',
-        width: 120,
-        render: (date) => date ? new Date(date).toLocaleDateString('ru-RU') : '—'
-    },
-    {
-        title: 'Статус',
-        dataIndex: 'status',
-        key: 'status',
-        width: 100,
-        render: (status) => (
-            <Tag color={status === 'active' ? 'green' : 'red'}>
-                {status === 'active' ? 'Активен' : 'Неактивен'}
-            </Tag>
-        ),
-        filters: [
-            { text: 'Активен', value: 'active' },
-            { text: 'Неактивен', value: 'inactive' },
-        ],
-        onFilter: (value, record) => record.status === value
-    },
-    {
-        title: 'Создан',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        width: 120,
-        render: (date) => new Date(date).toLocaleDateString('ru-RU'),
-        sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    },
-    {
-        title: 'Действия',
-        key: 'actions',
-        fixed: 'right',
-        width: 120,
-        render: (_, record) => (
-            <Space>
-                <Button 
-                    type="primary" 
-                    size="small" 
-                    icon={<EditOutlined />}
-                    // onClick={() => handleEdit(record)}
-                />
-                <Button 
-                    danger 
-                    size="small" 
-                    icon={<DeleteOutlined />}
-                    // onClick={() => handleDelete(record.id)}
-                />
-            </Space>
-        )
-    }
-]
+import ModalDelete from '../components/common/ModalDelete'
 
 const UserTable = () => {
     const navigate = useNavigate()
@@ -143,23 +20,154 @@ const UserTable = () => {
     const { data: usersData, error, isLoading, refetch } = useGetUsersQuery({
         search: searchText,
         page: currentPage,
-        limit: pageSize,
+        limit: pageSize
     })
 
-    // const handleEdit = (user: IUser) => {
-    //     console.log('Редактирование пользователя:', user)
-    //     navigate(`/edit/${user.id}`)
-    // }
-
-    // const handleDelete = (id: number) => {
-    //     console.log('Удаление пользователя:', id)
-    //     // Здесь будет логика удаления через RTK Mutation
-    // }
+    const handleRowClick = (record: IUser) => {
+        return {
+            onClick: (event: React.MouseEvent) => {
+                const target = event.target as HTMLElement
+                if (target.closest('button')) {
+                    return
+                }
+                navigate(`/${record.id}`)
+            },
+            style: { cursor: 'pointer' }
+        }
+    }
 
     const handleTableChange = (pagination: any, filters: any, sorter: any) => {
         setCurrentPage(pagination.current)
         setPageSize(pagination.pageSize)
     }
+
+    const columns: TableColumnsType<IUser> = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width: 80,
+            fixed: 'left',
+            sorter: (a, b) => a.id - b.id,
+        },
+        {
+            title: 'ФИО',
+            dataIndex: 'fullName',
+            key: 'fullName',
+            width: 200,
+            fixed: 'left',
+            render: (_, record) => (
+                <span>
+                    {record.lastName} {record.firstName.charAt(0)}.{record.patronymic ? record.patronymic.charAt(0) + '.' : ''}
+                </span>
+            ),
+            sorter: (a, b) => `${a.lastName}${a.firstName}`.localeCompare(`${b.lastName}${b.firstName}`)
+        },
+        {
+            title: 'Группа',
+            dataIndex: 'groupName',
+            key: 'groupName',
+            width: 150,
+            fixed: 'left',
+            render: (groupName) => groupName || '—',
+            sorter: (a, b) => (a.groupName || '').localeCompare(b.groupName || '')
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+            width: 200,
+            render: (email) => <a href={`mailto:${email}`}>{email}</a>
+        },
+        {
+            title: 'Телефон',
+            dataIndex: 'phone',
+            key: 'phone',
+            width: 150,
+            render: (phone) => phone || '—'
+        },
+        {
+            title: 'Должность',
+            dataIndex: 'position',
+            key: 'position',
+            width: 180,
+            render: (position) => getPositionLabel(position),
+            sorter: (a, b) => getPositionLabel(a.position).localeCompare(getPositionLabel(b.position))
+        },
+        {
+            title: 'Отдел',
+            dataIndex: 'department',
+            key: 'department',
+            width: 150,
+            render: (department) => getDepartmentLabel(department),
+            sorter: (a, b) => getDepartmentLabel(a.department).localeCompare(getDepartmentLabel(b.department)),
+        },
+        {
+            title: 'Дата приема',
+            dataIndex: 'hireDate',
+            key: 'hireDate',
+            width: 120,
+            render: (date) => new Date(date).toLocaleDateString('ru-RU'),
+            sorter: (a, b) => new Date(a.hireDate).getTime() - new Date(b.hireDate).getTime(),
+        },
+        {
+            title: 'Дата рождения',
+            dataIndex: 'birthDate',
+            key: 'birthDate',
+            width: 120,
+            render: (date) => date ? new Date(date).toLocaleDateString('ru-RU') : '—'
+        },
+        {
+            title: 'Статус',
+            dataIndex: 'status',
+            key: 'status',
+            width: 100,
+            render: (status) => (
+                <Tag color={status === 'active' ? 'green' : 'red'}>
+                    {status === 'active' ? 'Активен' : 'Неактивен'}
+                </Tag>
+            ),
+            filters: [
+                { text: 'Активен', value: 'active' },
+                { text: 'Неактивен', value: 'inactive' },
+            ],
+            onFilter: (value, record) => record.status === value
+        },
+        {
+            title: 'Создан',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            width: 120,
+            render: (date) => new Date(date).toLocaleDateString('ru-RU'),
+            sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        },
+        {
+            title: 'Действия',
+            key: 'actions',
+            fixed: 'right',
+            width: 120,
+            render: (_, record) => (
+                <Space>
+                    <Button 
+                        type="primary" 
+                        size="small" 
+                        icon={<EditOutlined />}
+                    />
+                    <ModalDelete 
+                        id={record.id}
+                        size="sm"
+                        onSuccess={() => {
+                            console.log('Пользователь удален')
+                            refetch()
+                        }}
+                        onError={(error) => {
+                            console.error('Ошибка удаления:', error)
+                        }}
+                    />
+                </Space>
+            )
+        }
+    ]
 
     if (isLoading) {
         return (
@@ -219,6 +227,7 @@ const UserTable = () => {
                 rowKey="id"
                 loading={isLoading}
                 onChange={handleTableChange}
+                onRow={handleRowClick}
             />
         </div>
     )

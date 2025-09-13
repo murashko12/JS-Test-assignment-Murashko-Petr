@@ -22,11 +22,7 @@ const UserCreatePage = () => {
     const [form] = Form.useForm()
     const [createUser, { isLoading }] = useCreateUserMutation()
 
-    useEffect(() => {
-        form.setFieldsValue({
-            hireDate: dayjs()
-        })
-    }, [form])
+    useEffect(() => {}, [form])
 
     const onFinish = async (values: any) => {
         try {
@@ -261,6 +257,9 @@ const UserCreatePage = () => {
                                         size="large"
                                         className="w-full"
                                         disabled={isLoading}
+                                        onChange={(date) => {
+                                            form.setFieldsValue({ hireDate: date })
+                                        }}
                                     />
                                 </ConfigProvider>
                             </Form.Item>
