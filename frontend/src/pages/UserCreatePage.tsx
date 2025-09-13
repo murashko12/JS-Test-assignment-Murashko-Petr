@@ -1,4 +1,4 @@
-import { DatePicker, Flex, Input, ConfigProvider, Select, Button, Card, Form, Space } from 'antd'
+import { DatePicker, Flex, Input, ConfigProvider, Select, Button, Card, Form, Space, message, Spin } from 'antd'
 import { 
     MailOutlined, 
     PhoneOutlined, 
@@ -10,15 +10,53 @@ import {
 import ruRU from 'antd/lib/locale/ru_RU'
 import { useNavigate } from 'react-router-dom'
 import { Department, DepartmentLabels, Position, PositionLabels } from '../config/enums.config'
+import { useCreateUserMutation } from '../services/api'
+import type { IUser } from '../types/User'
+import dayjs from 'dayjs'
+import { useEffect } from 'react'
 
 const { Option } = Select
 
 const UserCreatePage = () => {
     const navigate = useNavigate()
     const [form] = Form.useForm()
+    const [createUser, { isLoading }] = useCreateUserMutation()
 
-    const onFinish = (values: any) => {
-        console.log('Submitted values:', values)
+    useEffect(() => {
+        form.setFieldsValue({
+            hireDate: dayjs()
+        })
+    }, [form])
+
+    const onFinish = async (values: any) => {
+        try {
+            const userData: Partial<IUser> = {
+                ...values,
+                birthDate: values.birthDate && dayjs.isDayjs(values.birthDate) 
+                    ? values.birthDate.toISOString() 
+                    : undefined,
+                hireDate: values.hireDate && dayjs.isDayjs(values.hireDate)
+                    ? values.hireDate.toISOString()
+                    : undefined
+            }
+
+            const cleanedData = Object.fromEntries(
+                Object.entries(userData).filter(([_, value]) => value !== undefined)
+            )
+
+            await createUser(cleanedData).unwrap()
+            
+            message.success('Пользователь успешно создан!')
+            navigate('/')
+        } catch (error: any) {
+            console.error('Ошибка создания пользователя:', error)
+            message.error(error.data?.message || 'Не удалось создать пользователя')
+        }
+    }
+
+    const onFinishFailed = (errorInfo: any) => {
+        console.log('Failed:', errorInfo)
+        message.warning('Пожалуйста, заполните все обязательные поля правильно')
     }
 
     return (
@@ -30,6 +68,7 @@ const UserCreatePage = () => {
                         icon={<ArrowLeftOutlined />} 
                         onClick={() => navigate('/')}
                         className="flex items-center"
+                        disabled={isLoading}
                     >
                         Назад к списку
                     </Button>
@@ -39,6 +78,7 @@ const UserCreatePage = () => {
                             size="large" 
                             className="!bg-gray-200 !border-gray-200 hover:!bg-gray-300"   
                             onClick={() => navigate('/')} 
+                            disabled={isLoading}
                         >
                             Отменить
                         </Button>
@@ -48,13 +88,21 @@ const UserCreatePage = () => {
                             icon={<UserAddOutlined />}
                             className="!bg-green-500 !border-green-500 hover:!bg-green-600"
                             onClick={() => form.submit()}
+                            loading={isLoading}
                         >
                             Создать пользователя
                         </Button>
                     </Space>
                 </Flex>
 
-                <Form form={form} onFinish={onFinish} layout="vertical" className="space-y-6">
+                <Form 
+                    form={form} 
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
+                    layout="vertical" 
+                    className="space-y-6"
+                    disabled={isLoading}
+                >
                     <Card title="Основная информация" className="!shadow-sm">
                         <Flex gap={16} className="w-full">
                             <Form.Item
@@ -66,6 +114,7 @@ const UserCreatePage = () => {
                                 <Input
                                     size="large" 
                                     placeholder="Фамилия" 
+                                    disabled={isLoading}
                                 />
                             </Form.Item>
                             <Form.Item
@@ -77,6 +126,7 @@ const UserCreatePage = () => {
                                 <Input
                                     size="large" 
                                     placeholder="Имя" 
+                                    disabled={isLoading}
                                 />
                             </Form.Item>
                             <Form.Item
@@ -87,6 +137,7 @@ const UserCreatePage = () => {
                                 <Input
                                     size="large" 
                                     placeholder="Отчество" 
+                                    disabled={isLoading}
                                 />
                             </Form.Item>
                         </Flex>
@@ -101,8 +152,9 @@ const UserCreatePage = () => {
                             >
                                 <Input 
                                     size="large" 
-                                    placeholder="+7 (999) 999-99-99" 
+                                    placeholder="+7(999)999-99-99" 
                                     prefix={<PhoneOutlined />} 
+                                    disabled={isLoading}
                                 />
                             </Form.Item>
                             <Form.Item
@@ -118,6 +170,7 @@ const UserCreatePage = () => {
                                     size="large" 
                                     placeholder="email@example.com" 
                                     prefix={<MailOutlined />} 
+                                    disabled={isLoading}
                                 />
                             </Form.Item>
                         </Flex>
@@ -146,6 +199,7 @@ const UserCreatePage = () => {
                                         value,
                                         label: DepartmentLabels[value]
                                     }))}
+                                    disabled={isLoading}
                                 />
                             </Form.Item>
                             <Form.Item
@@ -169,6 +223,7 @@ const UserCreatePage = () => {
                                         value,
                                         label: PositionLabels[value]
                                     }))}
+                                    disabled={isLoading}
                                 />
                             </Form.Item>
                         </Flex>
@@ -187,13 +242,16 @@ const UserCreatePage = () => {
                                         placeholder="Дата рождения"
                                         size="large"
                                         className="w-full"
+                                        disabled={isLoading}
+                                        onChange={(date) => {
+                                            form.setFieldsValue({ birthDate: date })
+                                        }}
                                     />
                                 </ConfigProvider>
                             </Form.Item>
                             <Form.Item
                                 name="hireDate"
                                 label="Дата приема"
-                                rules={[{ required: true, message: 'Выберите дату приема' }]}
                                 className="flex-1 mb-0"
                             >
                                 <ConfigProvider locale={ruRU}>
@@ -202,6 +260,7 @@ const UserCreatePage = () => {
                                         placeholder="Дата приема"
                                         size="large"
                                         className="w-full"
+                                        disabled={isLoading}
                                     />
                                 </ConfigProvider>
                             </Form.Item>
@@ -215,7 +274,7 @@ const UserCreatePage = () => {
                             initialValue="active"
                             className="mb-0"
                         >
-                            <Select size="large">
+                            <Select size="large" disabled={isLoading}>
                                 <Option value="active">Активен</Option>
                                 <Option value="inactive">Неактивен</Option>
                             </Select>
@@ -231,10 +290,17 @@ const UserCreatePage = () => {
                             <Input.TextArea 
                                 placeholder="Дополнительная информация о пользователе..."
                                 rows={4}
+                                disabled={isLoading}
                             />
                         </Form.Item>
                     </Card>
                 </Form>
+
+                {isLoading && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <Spin size="large" tip="Создание пользователя..." />
+                    </div>
+                )}
             </Flex>
         </div>
     )
