@@ -36,15 +36,23 @@ export const PositionLabels: Record<Position, string> = {
 }
 
 export const getDepartmentOptions = () => {
-    Object.values(Department).map(value => ({
+    return Object.values(Department).map(value => ({
         value,
         label: DepartmentLabels[value]
     }))
 }
 
 export const getPositionOptions = () => {
-    Object.values(Position).map(value => ({
+    return Object.values(Position).map(value => ({
         value,
         label: PositionLabels[value]
     }))
+}
+
+export const getDepartmentLabel = (departmentKey: Department): string => {
+    return DepartmentLabels[departmentKey] || departmentKey
+}
+
+export const getPositionLabel = (positionKey: Position): string => {
+    return PositionLabels[positionKey] || positionKey
 }
