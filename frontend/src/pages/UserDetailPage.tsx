@@ -61,7 +61,7 @@ const UserDetailPage = () => {
                             size="large" 
                             icon={<EditOutlined />}
                             className="!text-white !bg-blue-500 !border-blue-500 hover:!bg-blue-600"
-                            onClick={() => navigate(`/edit/${user.id}`)}
+                            onClick={() => navigate(`/${user.id}/edit`)}
                         >
                             Редактировать
                         </Button>
