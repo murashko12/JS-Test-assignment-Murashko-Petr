@@ -43,7 +43,6 @@ const UserDetailPage = () => {
 
     const handleDeleteSuccess = () => {
         console.log('Пользователь удален')
-        // Перенаправляем на главную страницу после удаления
         navigate('/')
     }
 

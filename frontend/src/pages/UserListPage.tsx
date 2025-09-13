@@ -36,7 +36,7 @@ const UserTable = () => {
         }
     }
 
-    const handleTableChange = (pagination: any, filters: any, sorter: any) => {
+    const handleTableChange = (pagination: any) => {
         setCurrentPage(pagination.current)
         setPageSize(pagination.pageSize)
     }
@@ -152,6 +152,7 @@ const UserTable = () => {
                         type="primary" 
                         size="small" 
                         icon={<EditOutlined />}
+                        onClick={() => navigate(`/${record.id}/edit`)}
                     />
                     <ModalDelete 
                         id={record.id}
