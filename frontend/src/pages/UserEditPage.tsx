@@ -1,4 +1,4 @@
-import { DatePicker, Flex, Input, ConfigProvider, Select, Button, Card, Form, Space, message, Spin, Alert, Tag } from 'antd'
+import { DatePicker, Flex, Input, ConfigProvider, Select, Button, Card, Form, Space, message, Spin, Alert, Tag, Grid } from 'antd'
 import { 
     MailOutlined, 
     PhoneOutlined, 
@@ -16,11 +16,14 @@ import dayjs from 'dayjs'
 import { useEffect } from 'react'
 
 const { Option } = Select
+const { useBreakpoint } = Grid
 
 const UserEditPage = () => {
     const { id } = useParams()
     const navigate = useNavigate()
     const [form] = Form.useForm()
+    const screens = useBreakpoint()
+    const isMobile = !screens.md
     
     const { data: user, error, isLoading: isUserLoading } = useGetUserQuery(Number(id))
     const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation()
@@ -81,7 +84,7 @@ const UserEditPage = () => {
                 description="Не удалось загрузить данные пользователя. Попробуйте обновить страницу."
                 type="error"
                 showIcon
-                className="mb-4"
+                className="mb-4 mx-4"
             />
         )
     }
@@ -89,23 +92,26 @@ const UserEditPage = () => {
     const fullName = `${user.lastName} ${user.firstName} ${user.patronymic || ''}`.trim()
 
     return (
-        <div className="max-w-4xl mx-auto py-6">
-            <Flex vertical gap={24} className="w-full">
-                <Flex justify="space-between" align="center" className="mb-6">
+        <div className="max-w-4xl mx-auto py-4 px-2 md:py-6 md:px-0">
+            <Flex vertical gap={20} className="w-full">
+                {/* Заголовок и кнопки */}
+                <Flex vertical={isMobile} gap="middle" justify="space-between" align={isMobile ? "stretch" : "center"} className="mb-4">
                     <Button 
                         type="text" 
                         icon={<ArrowLeftOutlined />} 
                         onClick={() => navigate(`/${id}`)}
-                        className="flex items-center"
+                        className="flex items-center self-start"
                         disabled={isUpdating}
+                        size={isMobile ? "middle" : "large"}
                     >
                         Назад к профилю
                     </Button>
-                    <Space>
+                    
+                    <Space direction={isMobile ? "vertical" : "horizontal"} size="middle" className={isMobile ? "w-full" : ""}>
                         <Button
                             type="default" 
-                            size="large" 
-                            className="!bg-gray-200 !border-gray-200 hover:!bg-gray-300"   
+                            size={isMobile ? "middle" : "large"}
+                            className="!bg-gray-200 !border-gray-200 hover:!bg-gray-300 w-full md:w-auto"   
                             onClick={() => navigate(`/${id}`)} 
                             disabled={isUpdating}
                         >
@@ -113,40 +119,43 @@ const UserEditPage = () => {
                         </Button>
                         <Button
                             type="primary" 
-                            size="large" 
+                            size={isMobile ? "middle" : "large"}
                             icon={<SaveOutlined />}
-                            className="!bg-blue-500 !border-blue-500 hover:!bg-blue-600"
+                            className="!bg-blue-500 !border-blue-500 hover:!bg-blue-600 w-full md:w-auto"
                             onClick={() => form.submit()}
                             loading={isUpdating}
                         >
-                            Сохранить изменения
+                            Сохранить
                         </Button>
                     </Space>
                 </Flex>
 
-                <Card className="!shadow-sm mb-4">
+                {/* Информация о пользователе */}
+                <Card className="!shadow-sm">
                     <Flex vertical gap="small" className="flex-1">
-                        <h1 className="text-2xl font-bold mb-2">Редактирование: {fullName}</h1>
+                        <h1 className="text-xl md:text-2xl font-bold mb-2">Редактирование: {fullName}</h1>
                         <Tag color={user.status === 'active' ? 'green' : 'red'} className="!text-sm">
                             {user.status === 'active' ? 'Активен' : 'Неактивен'}
                         </Tag>
-                        <p className="text-gray-500">ID: {user.id}</p>
+                        <p className="text-gray-500 text-sm md:text-base">ID: {user.id}</p>
                     </Flex>
                 </Card>
 
+                {/* Форма */}
                 <Form 
                     form={form} 
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
                     layout="vertical" 
-                    className="space-y-6"
+                    className="space-y-4 md:space-y-6"
                     disabled={isUpdating}
                     initialValues={{
                         status: user.status
                     }}
                 >
+                    {/* Основная информация */}
                     <Card title="Основная информация" className="!shadow-sm">
-                        <Flex gap={16} className="w-full">
+                        <Flex vertical={isMobile} gap={16} className="w-full">
                             <Form.Item
                                 name="lastName"
                                 label="Фамилия"
@@ -154,7 +163,7 @@ const UserEditPage = () => {
                                 className="flex-1 mb-0"
                             >
                                 <Input
-                                    size="large" 
+                                    size={isMobile ? "middle" : "large"} 
                                     placeholder="Фамилия" 
                                     disabled={isUpdating}
                                 />
@@ -166,7 +175,7 @@ const UserEditPage = () => {
                                 className="flex-1 mb-0"
                             >
                                 <Input
-                                    size="large" 
+                                    size={isMobile ? "middle" : "large"} 
                                     placeholder="Имя" 
                                     disabled={isUpdating}
                                 />
@@ -177,7 +186,7 @@ const UserEditPage = () => {
                                 className="flex-1 mb-0"
                             >
                                 <Input
-                                    size="large" 
+                                    size={isMobile ? "middle" : "large"} 
                                     placeholder="Отчество" 
                                     disabled={isUpdating}
                                 />
@@ -185,15 +194,16 @@ const UserEditPage = () => {
                         </Flex>
                     </Card>
 
+                    {/* Контактная информация */}
                     <Card title="Контактная информация" size="small" className="!shadow-sm">
-                        <Flex gap={16} className="w-full">
+                        <Flex vertical={isMobile} gap={16} className="w-full">
                             <Form.Item
                                 name="phone"
                                 label="Телефон"
                                 className="flex-1 mb-0"
                             >
                                 <Input 
-                                    size="large" 
+                                    size={isMobile ? "middle" : "large"} 
                                     placeholder="+7(999)999-99-99" 
                                     prefix={<PhoneOutlined />} 
                                     disabled={isUpdating}
@@ -209,7 +219,7 @@ const UserEditPage = () => {
                                 className="flex-1 mb-0"
                             >
                                 <Input 
-                                    size="large" 
+                                    size={isMobile ? "middle" : "large"} 
                                     placeholder="email@example.com" 
                                     prefix={<MailOutlined />} 
                                     disabled={isUpdating}
@@ -218,8 +228,9 @@ const UserEditPage = () => {
                         </Flex>
                     </Card>
 
+                    {/* Рабочая информация */}
                     <Card title="Рабочая информация" size="small" className="!shadow-sm">
-                        <Flex gap={16} className="w-full">
+                        <Flex vertical={isMobile} gap={16} className="w-full">
                             <Form.Item
                                 name="department"
                                 label="Отдел"
@@ -227,7 +238,7 @@ const UserEditPage = () => {
                                 className="flex-1 mb-0"
                             >
                                 <Select
-                                    size="large"
+                                    size={isMobile ? "middle" : "large"}
                                     showSearch
                                     placeholder={
                                         <span>
@@ -251,7 +262,7 @@ const UserEditPage = () => {
                                 className="flex-1 mb-0"
                             >
                                 <Select
-                                    size="large"
+                                    size={isMobile ? "middle" : "large"}
                                     showSearch
                                     placeholder={
                                         <span>
@@ -271,8 +282,9 @@ const UserEditPage = () => {
                         </Flex>
                     </Card>
 
+                    {/* Личная информация */}
                     <Card title="Личная информация" size="small" className="!shadow-sm">
-                        <Flex gap={16} className="w-full">
+                        <Flex vertical={isMobile} gap={16} className="w-full">
                             <Form.Item
                                 name="birthDate"
                                 label="Дата рождения"
@@ -282,7 +294,7 @@ const UserEditPage = () => {
                                     <DatePicker
                                         format="DD.MM.YYYY"
                                         placeholder="Дата рождения"
-                                        size="large"
+                                        size={isMobile ? "middle" : "large"}
                                         className="w-full"
                                         disabled={isUpdating}
                                     />
@@ -297,7 +309,7 @@ const UserEditPage = () => {
                                     <DatePicker
                                         format="DD.MM.YYYY"
                                         placeholder="Дата приема"
-                                        size="large"
+                                        size={isMobile ? "middle" : "large"}
                                         className="w-full"
                                         disabled={isUpdating}
                                     />
@@ -306,19 +318,21 @@ const UserEditPage = () => {
                         </Flex>
                     </Card>
 
+                    {/* Статус */}
                     <Card title="Статус" size="small" className="!shadow-sm">
                         <Form.Item
                             name="status"
                             label="Статус пользователя"
                             className="mb-0"
                         >
-                            <Select size="large" disabled={isUpdating}>
+                            <Select size={isMobile ? "middle" : "large"} disabled={isUpdating}>
                                 <Option value="active">Активен</Option>
                                 <Option value="inactive">Неактивен</Option>
                             </Select>
                         </Form.Item>
                     </Card>
 
+                    {/* Дополнительная информация */}
                     <Card title="Дополнительная информация" size="small" className="!shadow-sm">
                         <Form.Item
                             name="notes"
@@ -327,7 +341,7 @@ const UserEditPage = () => {
                         >
                             <Input.TextArea 
                                 placeholder="Дополнительная информация о пользователе..."
-                                rows={4}
+                                rows={3}
                                 disabled={isUpdating}
                             />
                         </Form.Item>

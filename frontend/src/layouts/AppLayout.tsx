@@ -102,12 +102,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 alignItems: 'center', 
                 flexShrink: 0,
                 justifyContent: 'space-between',
-                padding: '0 24px'
+                padding: '0 50px'
             }}>
-                <div style={{ color: 'white', fontSize: '18px', fontWeight: 'bold' }}>
-                    User Management System
-                </div>
-                
                 <Space>
                     <Button
                         type="primary"
