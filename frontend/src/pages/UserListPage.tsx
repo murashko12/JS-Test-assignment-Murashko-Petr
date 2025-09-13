@@ -140,7 +140,6 @@ const UserTable = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
 
-    // RTK Query hook
     const { data: usersData, error, isLoading, refetch } = useGetUsersQuery({
         search: searchText,
         page: currentPage,
@@ -215,7 +214,7 @@ const UserTable = () => {
                     total: usersData?.pagination?.total || 0,
                     showTotal: (total, range) => `${range[0]}-${range[1]} из ${total} пользователей`,
                     showSizeChanger: true,
-                    showQuickJumper: true,
+                    showQuickJumper: true
                 }}
                 rowKey="id"
                 loading={isLoading}
